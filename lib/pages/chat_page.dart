@@ -44,48 +44,14 @@ class _ChatPageState
     super.initState();
 
     _loadMessages();
-
-    _subscribe();
   }
-
-  @override
-  void dispose() {
-    _messageService.unsubscribe();
-
-    _messageController.dispose();
-
-    _scrollController.dispose();
-
-    super.dispose();
-  }
-
-  void _subscribe() {
-  _messageService.subscribe(
-    widget.dialog.id,
-    (message) {
-      if (!mounted) return;
-
-      final exists = _messages.any(
-        (m) => m.id == message.id,
-      );
-
-      if (exists) return;
-
-      setState(() {
-        _messages.add(message);
-      });
-
-      _scrollToBottom();
-    },
-  );
-}
 
   Future<void> _loadMessages() async {
-  try {
     final messages =
-        await _messageService.getMessages(
-      widget.dialog.id,
-    );
+    await _messageService
+        .getMessages(
+  widget.dialog.id,
+);
 
     if (!mounted) return;
 
@@ -95,16 +61,7 @@ class _ChatPageState
     });
 
     _scrollToBottom();
-  } catch (e) {
-    print(e);
-
-    if (!mounted) return;
-
-    setState(() {
-      _isLoading = false;
-    });
   }
-}
 
   Future<void> _sendMessage() async {
     final auth =
@@ -126,22 +83,21 @@ class _ChatPageState
       _isSending = true;
     });
 
-    try {
-      await _messageService.sendMessage(
-        dialogId: widget.dialog.id,
-        senderId: currentUserId,
-        text: text,
-      );
+    await _messageService.sendMessage(
+      dialogId: widget.dialog.id,
+      senderId: currentUserId,
+      text: text,
+    );
 
-      _messageController.clear();
-    } 
-    finally {
-  if (mounted) {
+    _messageController.clear();
+
+    await _loadMessages();
+
+    if (!mounted) return;
+
     setState(() {
       _isSending = false;
     });
-  }
-}
   }
 
   void _scrollToBottom() {
@@ -152,13 +108,9 @@ class _ChatPageState
         return;
       }
 
-      _scrollController.animateTo(
+      _scrollController.jumpTo(
         _scrollController
             .position.maxScrollExtent,
-        duration: const Duration(
-          milliseconds: 250,
-        ),
-        curve: Curves.easeOut,
       );
     });
   }
@@ -183,30 +135,35 @@ class _ChatPageState
                     child:
                         CircularProgressIndicator(),
                   )
-                : ListView.builder(
-                    controller:
-                        _scrollController,
-                    padding:
-                        const EdgeInsets.all(
-                      12,
-                    ),
-                    itemCount:
-                        _messages.length,
-                    itemBuilder:
-                        (context, index) {
-                      final message =
-                          _messages[index];
+                : _messages.isEmpty
+                    ? const Center(
+                        child: Text(
+                          'Сообщений пока нет',
+                        ),
+                      )
+                    : ListView.builder(
+                        controller:
+                            _scrollController,
+                        padding:
+                            const EdgeInsets.all(
+                          12,
+                        ),
+                        itemCount:
+                            _messages.length,
+                        itemBuilder:
+                            (context, index) {
+                          final message =
+                              _messages[index];
 
-                      return MessageBubble(
-                        message: message,
-                        isMine:
-                            message.senderId ==
-                                currentUserId,
-                      );
-                    },
-                  ),
+                          return MessageBubble(
+                            message: message,
+                            isMine:
+                                message.senderId ==
+                                    currentUserId,
+                          );
+                        },
+                      ),
           ),
-
           Container(
             padding:
                 const EdgeInsets.all(12),
@@ -223,9 +180,6 @@ class _ChatPageState
                     ),
                   ),
                 ),
-
-                const SizedBox(width: 8),
-
                 IconButton(
                   onPressed:
                       _isSending

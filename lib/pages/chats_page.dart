@@ -114,65 +114,113 @@ void _subscribe() {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title:
-            const Text('Сообщения'),
+  backgroundColor: const Color(0xFFF5F7FB),
 
-        actions: [
-          IconButton(
-            onPressed: () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) =>
-                      const CreateDialogPage(),
-                ),
-              );
+  appBar: AppBar(
+    elevation: 0,
+    backgroundColor: const Color(0xFF3F7CFF),
+    centerTitle: true,
+    title: const Text(
+      'Сообщения',
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 28,
+        color: Colors.white,
+      ),
+    ),
+    actions: [
+      IconButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) =>
+                  const CreateDialogPage(),
+            ),
+          );
+        },
+        icon: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
+      ),
+      IconButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) =>
+                  const ProfilePage(),
+            ),
+          );
+        },
+        icon: const Icon(
+          Icons.person,
+          color: Colors.white,
+        ),
+      ),
+    ],
+  ),
 
-              _loadDialogs();
-            },
-            icon:
-                const Icon(Icons.add),
+  body: Column(
+    children: [
+      Container(
+        color: const Color(0xFF3F7CFF),
+        padding: const EdgeInsets.fromLTRB(
+          16,
+          0,
+          16,
+          18,
+        ),
+        child: Container(
+          height: 48,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
           ),
-
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) =>
-                      const ProfilePage(),
-                ),
-              );
-            },
-            icon: const Icon(
-              Icons.person,
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: 'Поиск',
+              hintStyle: TextStyle(
+                color: Colors.grey.shade500,
+              ),
+              prefixIcon: Icon(
+                Icons.search,
+                color: Colors.grey.shade500,
+              ),
+              border: InputBorder.none,
+              contentPadding:
+                  const EdgeInsets.only(top: 12),
             ),
           ),
-        ],
+        ),
       ),
 
-      body: _isLoading
-          ? const Center(
-              child:
-                  CircularProgressIndicator(),
-            )
-          : _dialogs.isEmpty
-              ? const Center(
-                  child: Text(
-                    'Диалогов пока нет',
-                  ),
-                )
-              : RefreshIndicator(
-                  onRefresh:
-                      _loadDialogs,
-                  child: ListView.builder(
-                    itemCount:
-                        _dialogs.length,
-                    itemBuilder:
-                        (context, index) {
-                      final dialog =
-                          _dialogs[index];
+      Expanded(
+        child: _isLoading
+            ? const Center(
+                child:
+                    CircularProgressIndicator(),
+              )
+            : _dialogs.isEmpty
+                ? const Center(
+                    child: Text(
+                      'Чатов пока нет',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 16,
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    padding:
+                        const EdgeInsets.only(
+                      top: 10,
+                      bottom: 20,
+                    ),
+                    itemCount: _dialogs.length,
+                    itemBuilder: (context, i) {
+                      final dialog = _dialogs[i];
 
                       return ChatTile(
                         dialog: dialog,
@@ -182,8 +230,7 @@ void _subscribe() {
                             MaterialPageRoute(
                               builder: (_) =>
                                   ChatPage(
-                                dialog:
-                                    dialog,
+                                dialog: dialog,
                               ),
                             ),
                           );
@@ -191,7 +238,9 @@ void _subscribe() {
                       );
                     },
                   ),
-                ),
-    );
+      ),
+    ],
+  ),
+);
   }
 }

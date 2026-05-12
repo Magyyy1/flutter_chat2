@@ -13,34 +13,35 @@ class MessageModel {
     required this.createdAt,
   });
 
-  factory MessageModel.fromRecord(dynamic record) {
+  factory MessageModel.fromRecord(
+    dynamic record,
+  ) {
     dynamic sender;
 
     try {
-      sender = record.expand['sender'];
+      sender =
+          record.expand['sender'];
     } catch (_) {}
 
     return MessageModel(
-      id: record.id.toString(),
-
+      id: record.id,
       text:
-          record.data['text']?.toString() ?? '',
-
+          (record.data['text'] ?? '')
+              .toString(),
       senderId:
-          record.data['sender']?.toString() ?? '',
-
+          (record.data['sender'] ?? '')
+              .toString(),
       senderName:
           sender != null
-              ? sender.data['name']
-                      ?.toString() ??
-                  'User'
-              : 'User',
-
-      createdAt:
-          DateTime.tryParse(
-                record.created.toString(),
-              ) ??
-              DateTime.now(),
+              ? (sender.data['name'] ??
+                      sender.data['email'] ??
+                      'Пользователь')
+                  .toString()
+              : 'Пользователь',
+      createdAt: DateTime.tryParse(
+            record.created.toString(),
+          ) ??
+          DateTime.now(),
     );
   }
 }

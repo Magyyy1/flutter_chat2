@@ -44,7 +44,8 @@ class DialogModel {
           otherUser?.data['email']?.toString() ??
           'Пользователь',
       lastMessage:
-          record.data['last_message']?.toString() ?? '',
+    (record.data['last_message'] ?? '')
+        .toString(),
       updatedAt:
           DateTime.tryParse(record.updated) ??
           DateTime.now(),

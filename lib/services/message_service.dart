@@ -8,45 +8,57 @@ class MessageService {
       PocketBaseService.instance.client;
 
   Future<List<MessageModel>> getMessages(
-  String dialogId,
-) async {
-  try {
+    String dialogId,
+  ) async {
     final records = await _pb
         .collection('messages')
         .getFullList(
-          expand: 'sender',
           sort: 'created',
+          expand: 'sender',
         );
 
-    print(records.first.data);
-
-    final filtered = records.where((record) {
-      final dialog =
-          record.data['dialog'];
-
-      print(dialog);
-
-      if (dialog == null) {
-        return false;
-      }
-
-      return dialog
-          .toString()
-          .contains(dialogId);
+    final filtered = records.where((e) {
+      return e.data['dialog']
+              .toString() ==
+          dialogId;
     }).toList();
 
-    print(filtered.length);
+    return filtered.map((e) {
+      final senderList =
+          e.expand['sender'];
 
-    return filtered
-        .map(
-          (e) => MessageModel.fromRecord(e),
-        )
-        .toList();
-  } catch (e) {
-    print(e);
-    return [];
+      dynamic sender;
+
+      if (senderList != null &&
+          senderList is List &&
+          senderList.isNotEmpty) {
+        sender = senderList.first;
+      }
+
+      return MessageModel(
+        id: e.id,
+        text:
+            e.data['text']
+                .toString(),
+        senderId:
+            e.data['sender']
+                .toString(),
+        senderName:
+            sender != null
+                ? (sender.data['name'] ??
+                        sender.data['email'] ??
+                        'Пользователь')
+                    .toString()
+                : 'Пользователь',
+        createdAt:
+            DateTime.tryParse(
+                  e.created,
+                ) ??
+                DateTime.now(),
+      );
+    }).toList();
   }
-}
+
   Future<void> sendMessage({
     required String dialogId,
     required String senderId,
@@ -66,33 +78,5 @@ class MessageService {
         'last_message': text,
       },
     );
-  }
-
-  void subscribe(
-  String dialogId,
-  Function(MessageModel) onNewMessage,
-) {
-  _pb.collection('messages').subscribe('*', (e) async {
-    final record = e.record;
-
-    if (record == null) return;
-
-    if (record.data['dialog'] == dialogId) {
-      final fullRecord = await _pb
-          .collection('messages')
-          .getOne(
-            record.id,
-            expand: 'sender',
-          );
-
-      onNewMessage(
-        MessageModel.fromRecord(fullRecord),
-      );
-    }
-  });
-}
-
-  void unsubscribe() {
-    _pb.collection('messages').unsubscribe('*');
   }
 }
