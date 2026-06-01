@@ -30,7 +30,6 @@ class MessageService {
       dynamic sender;
 
       if (senderList != null &&
-          senderList is List &&
           senderList.isNotEmpty) {
         sender = senderList.first;
       }
