@@ -26,8 +26,7 @@ class AuthController extends ChangeNotifier {
 
   String? get currentUserId => currentUser?.id;
 
-  bool get isAuthenticated =>
-      _pb.authStore.isValid && currentUser != null;
+  bool get isAuthenticated => _pb.authStore.isValid && currentUser != null;
 
   Future<void> initialize() async {
     _isInitialized = true;
@@ -42,17 +41,13 @@ class AuthController extends ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      await _pb.collection('users').authWithPassword(
-            email,
-            password,
-          );
+      await _pb.collection('users').authWithPassword(email, password);
 
       return null;
     } on ClientException catch (e) {
       print(e.response);
 
-      return e.response['message']?.toString() ??
-          'Ошибка входа';
+      return e.response['message']?.toString() ?? 'Ошибка входа';
     } catch (e) {
       print(e);
 
@@ -72,27 +67,25 @@ class AuthController extends ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      await _pb.collection('users').create(
-        body: {
-          'name': name,
-          'email': email,
-          'password': password,
-          'passwordConfirm': password,
-          'emailVisibility': true,
-        },
-      );
-
-      await _pb.collection('users').authWithPassword(
-            email,
-            password,
+      await _pb
+          .collection('users')
+          .create(
+            body: {
+              'name': name,
+              'email': email,
+              'password': password,
+              'passwordConfirm': password,
+              'emailVisibility': true,
+            },
           );
+
+      await _pb.collection('users').authWithPassword(email, password);
 
       return null;
     } on ClientException catch (e) {
       print(e.response);
 
-      return e.response['message']?.toString() ??
-          'Ошибка регистрации';
+      return e.response['message']?.toString() ?? 'Ошибка регистрации';
     } catch (e) {
       print(e);
 

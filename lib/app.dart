@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'core/theme.dart';
 import 'pages/chats_page.dart';
 import 'pages/login_page.dart';
 import 'pages/splash_page.dart';
@@ -14,7 +15,7 @@ class FlutterChatApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Chat',
-      theme: ThemeData.light(),
+      theme: AppTheme.lightTheme, // Вот здесь подключили твою тему
       home: const AppRoot(),
     );
   }

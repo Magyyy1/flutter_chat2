@@ -3,11 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/dialog_model.dart';
 
 class ChatTile extends StatelessWidget {
-  const ChatTile({
-    super.key,
-    required this.dialog,
-    required this.onTap,
-  });
+  const ChatTile({super.key, required this.dialog, required this.onTap});
 
   final DialogModel dialog;
   final VoidCallback onTap;
@@ -15,10 +11,7 @@ class ChatTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 6,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: Material(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
@@ -39,9 +32,7 @@ class ChatTile extends StatelessWidget {
                   ),
                   child: Center(
                     child: Text(
-                      dialog.otherUserName
-                          .substring(0, 1)
-                          .toUpperCase(),
+                      dialog.otherUserName.substring(0, 1).toUpperCase(),
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -55,8 +46,7 @@ class ChatTile extends StatelessWidget {
 
                 Expanded(
                   child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         dialog.otherUserName,

@@ -23,10 +23,7 @@ class PocketBaseService {
       initial: prefs.getString('pb_auth'),
     );
 
-    final client = PocketBase(
-      pocketBaseUrl,
-      authStore: store,
-    );
+    final client = PocketBase(pocketBaseUrl, authStore: store);
 
     instance = PocketBaseService._(client);
   }

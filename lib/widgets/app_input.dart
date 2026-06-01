@@ -17,9 +17,7 @@ class AppInput extends StatelessWidget {
     return TextField(
       controller: controller,
       obscureText: obscureText,
-      decoration: InputDecoration(
-        hintText: hint,
-      ),
+      decoration: InputDecoration(hintText: hint),
     );
   }
 }
