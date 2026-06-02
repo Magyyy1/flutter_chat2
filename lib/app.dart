@@ -15,7 +15,7 @@ class FlutterChatApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Chat',
-      theme: AppTheme.lightTheme, // Вот здесь подключили твою тему
+      theme: AppTheme.lightTheme,
       home: const AppRoot(),
     );
   }

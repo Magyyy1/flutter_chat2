@@ -10,21 +10,15 @@ class CreateDialogPage extends StatefulWidget {
   const CreateDialogPage({super.key});
 
   @override
-  State<CreateDialogPage> createState() =>
-      _CreateDialogPageState();
+  State<CreateDialogPage> createState() => _CreateDialogPageState();
 }
 
-class _CreateDialogPageState
-    extends State<CreateDialogPage> {
-  final UserService _userService =
-      UserService();
+class _CreateDialogPageState extends State<CreateDialogPage> {
+  final UserService _userService = UserService();
 
-  final DialogService _dialogService =
-      DialogService();
+  final DialogService _dialogService = DialogService();
 
-  final TextEditingController
-      _searchController =
-      TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
   List<AppUser> _users = [];
 
@@ -33,8 +27,7 @@ class _CreateDialogPageState
   Future<void> _search() async {
     final auth = context.read<AuthController>();
 
-    final currentUserId =
-        auth.currentUserId;
+    final currentUserId = auth.currentUserId;
 
     if (currentUserId == null) return;
 
@@ -42,8 +35,7 @@ class _CreateDialogPageState
       _isLoading = true;
     });
 
-    final users =
-        await _userService.searchUsers(
+    final users = await _userService.searchUsers(
       _searchController.text.trim(),
       currentUserId,
     );
@@ -56,13 +48,10 @@ class _CreateDialogPageState
     });
   }
 
-  Future<void> _createDialog(
-    AppUser user,
-  ) async {
+  Future<void> _createDialog(AppUser user) async {
     final auth = context.read<AuthController>();
 
-    final currentUserId =
-        auth.currentUserId;
+    final currentUserId = auth.currentUserId;
 
     if (currentUserId == null) return;
 
@@ -79,69 +68,65 @@ class _CreateDialogPageState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title:
-            const Text('Новый диалог'),
-      ),
+      appBar: AppBar(title: const Text('Новый диалог')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             TextField(
-              controller:
-                  _searchController,
-              decoration:
-                  InputDecoration(
-                hintText:
-                    'Поиск пользователя',
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Поиск пользователя',
                 suffixIcon: IconButton(
                   onPressed: _search,
-                  icon:
-                      const Icon(Icons.search),
+                  icon: const Icon(Icons.search),
                 ),
               ),
-              onSubmitted: (_) =>
-                  _search(),
+              onSubmitted: (_) => _search(),
             ),
 
             const SizedBox(height: 16),
 
             Expanded(
               child: _isLoading
-                  ? const Center(
-                      child:
-                          CircularProgressIndicator(),
+                  ? const Center(child: CircularProgressIndicator())
+                  : _users.isEmpty && _searchController.text.isNotEmpty
+                  ? Center(
+                      child: Text(
+                        'Пользователи не найдены',
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 16,
+                        ),
+                      ),
+                    )
+                  : _users.isEmpty && _searchController.text.isEmpty
+                  ? Center(
+                      child: Text(
+                        'Введите имя для поиска',
+                        style: TextStyle(
+                          color: Colors.grey.shade400,
+                          fontSize: 16,
+                        ),
+                      ),
                     )
                   : ListView.builder(
-                      itemCount:
-                          _users.length,
-                      itemBuilder:
-                          (context, i) {
-                        final user =
-                            _users[i];
-
+                      itemCount: _users.length,
+                      itemBuilder: (context, i) {
+                        final user = _users[i];
                         return ListTile(
-                          onTap: () =>
-                              _createDialog(
-                            user,
-                          ),
-
-                          leading:
-                              CircleAvatar(
+                          onTap: () => _createDialog(user),
+                          leading: CircleAvatar(
                             child: Text(
-                              user.name
-                                  .substring(
-                                      0,
-                                      1)
-                                  .toUpperCase(),
+                              user.name.isNotEmpty
+                                  ? user.name.substring(0, 1).toUpperCase()
+                                  : '?',
                             ),
                           ),
-
-                          title:
-                              Text(user.name),
-
-                          subtitle:
-                              Text(user.email),
+                          title: Text(
+                            user.name.isNotEmpty ? user.name : 'Без имени',
+                          ),
+                          subtitle: Text(user.email),
                         );
                       },
                     ),

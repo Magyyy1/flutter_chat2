@@ -43,7 +43,6 @@ class _ChatsPageState extends State<ChatsPage> {
           setState(() {
             _dialogs = _dialogs.map((e) {
               if (e.id == dialog.id) {
-                // Если по сокету прилетел обрезанный диалог, берем имя из старого стейта
                 final resolvedName = dialog.otherUserName == 'Неизвестный'
                     ? e.otherUserName
                     : dialog.otherUserName;

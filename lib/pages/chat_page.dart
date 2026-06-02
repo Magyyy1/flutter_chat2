@@ -8,30 +8,20 @@ import '../services/message_service.dart';
 import '../widgets/message_bubble.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({
-    super.key,
-    required this.dialog,
-  });
+  const ChatPage({super.key, required this.dialog});
 
   final DialogModel dialog;
 
   @override
-  State<ChatPage> createState() =>
-      _ChatPageState();
+  State<ChatPage> createState() => _ChatPageState();
 }
 
-class _ChatPageState
-    extends State<ChatPage> {
-  final MessageService _messageService =
-      MessageService();
+class _ChatPageState extends State<ChatPage> {
+  final MessageService _messageService = MessageService();
 
-  final TextEditingController
-      _messageController =
-      TextEditingController();
+  final TextEditingController _messageController = TextEditingController();
 
-  final ScrollController
-      _scrollController =
-      ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   List<MessageModel> _messages = [];
 
@@ -47,11 +37,7 @@ class _ChatPageState
   }
 
   Future<void> _loadMessages() async {
-    final messages =
-    await _messageService
-        .getMessages(
-  widget.dialog.id,
-);
+    final messages = await _messageService.getMessages(widget.dialog.id);
 
     if (!mounted) return;
 
@@ -64,18 +50,13 @@ class _ChatPageState
   }
 
   Future<void> _sendMessage() async {
-    final auth =
-        context.read<AuthController>();
+    final auth = context.read<AuthController>();
 
-    final currentUserId =
-        auth.currentUserId;
+    final currentUserId = auth.currentUserId;
 
-    final text =
-        _messageController.text.trim();
+    final text = _messageController.text.trim();
 
-    if (currentUserId == null ||
-        text.isEmpty ||
-        _isSending) {
+    if (currentUserId == null || text.isEmpty || _isSending) {
       return;
     }
 
@@ -101,98 +82,115 @@ class _ChatPageState
   }
 
   void _scrollToBottom() {
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) {
-      if (!_scrollController
-          .hasClients) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_scrollController.hasClients) {
         return;
       }
 
-      _scrollController.jumpTo(
-        _scrollController
-            .position.maxScrollExtent,
-      );
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final currentUserId =
-        context
-            .read<AuthController>()
-            .currentUserId;
+    final currentUserId = context.read<AuthController>().currentUserId;
 
     return Scaffold(
-      appBar: AppBar(
-        title:
-            Text(widget.dialog.otherUserName),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: _isLoading
-                ? const Center(
-                    child:
-                        CircularProgressIndicator(),
-                  )
-                : _messages.isEmpty
-                    ? const Center(
-                        child: Text(
-                          'Сообщений пока нет',
+      appBar: AppBar(title: Text(widget.dialog.otherUserName)),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            stops: [0.1, 0.9],
+            colors: [
+              Color.fromRGBO(110, 169, 232, 1), 
+              Color.fromRGBO(233, 240, 247, 1),
+            ],
+          ),
+        ),
+        child: Column(
+          children: [
+            Expanded(
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _messages.isEmpty
+                  ? Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
                         ),
-                      )
-                    : ListView.builder(
-                        controller:
-                            _scrollController,
-                        padding:
-                            const EdgeInsets.all(
-                          12,
+                        decoration: BoxDecoration(
+                          color: Colors.white70,
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        itemCount:
-                            _messages.length,
-                        itemBuilder:
-                            (context, index) {
-                          final message =
-                              _messages[index];
-
-                          return MessageBubble(
-                            message: message,
-                            isMine:
-                                message.senderId ==
-                                    currentUserId,
-                          );
-                        },
+                        child: const Text('Сообщений пока нет'),
                       ),
-          ),
-          Container(
-            padding:
-                const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller:
-                        _messageController,
-                    decoration:
-                        const InputDecoration(
-                      hintText:
-                          'Сообщение',
+                    )
+                  : ListView.builder(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.all(12),
+                      itemCount: _messages.length,
+                      itemBuilder: (context, index) {
+                        final message = _messages[index];
+                        return MessageBubble(
+                          message: message,
+                          isMine: message.senderId == currentUserId,
+                        );
+                      },
                     ),
-                  ),
-                ),
-                IconButton(
-                  onPressed:
-                      _isSending
-                          ? null
-                          : _sendMessage,
-                  icon: const Icon(
-                    Icons.send,
-                  ),
-                ),
-              ],
             ),
-          ),
-        ],
+            Container(
+              color: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              child: SafeArea(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _messageController,
+                        decoration: InputDecoration(
+                          hintText: 'Сообщение...',
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 10,
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey.shade50,
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(24),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(24),
+                            borderSide: const BorderSide(
+                              color: Colors.blue,
+                              width: 1.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    CircleAvatar(
+                      backgroundColor: Colors.blue,
+                      radius: 22,
+                      child: IconButton(
+                        onPressed: _isSending ? null : _sendMessage,
+                        icon: const Icon(
+                          Icons.send,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
